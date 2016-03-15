@@ -187,7 +187,7 @@ key in the table, of two basic things:
 1. Which transactions currently have a lock on that key (the "granted group" of transactions), and what the lock mode is.
 2. A queue of transactions that are waiting to be granted a lock on that key -- and the lock mode that they are waiting for.
 
-When a transaction requests a lock in a mode that conflicts with the current holder of the lock, the requesting transaction should be placed on a FIFO queue of transactions waiting for that lock.
+When a transaction requests a lock in a mode that conflicts with the current holder of the lock, the requesting transaction should be placed on a FIFO queue of transactions waiting for that lock. Note that even if the requested lock is compatible with the current granted group, when we have other transactions on the wait queue, we still want to put the transaction requesting the lock to the wait queue in order to be fair (otherwise the transactions on the wait queue may get starved).
 
 When a transaction leaves the system (via commit or abort), all mutually
 compatible transactions at the head of the FIFO queue should be granted the
