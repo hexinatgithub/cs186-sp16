@@ -260,6 +260,7 @@ apply SQL operators. For this question, you may use either approach.
 
 Answer the following questions by writing queries:
  1. Who are the 4 front-runners?
+    Hint: Take a look at the output of the demonstration. What values do we want these columns to have?
  2. How many individual contributions has each candidate received? 
     Hint: Which table might you want to join on?
  3. How much has each candidate received from individual contributions?
