@@ -116,7 +116,7 @@ SELECT x
 FROM points
 WHERE x > 0
  AND y < 0
- AND rand() > 0.2;
+ AND rand() < 0.2;
 ```
 
 Alternatively, we can read this table into a Spark DataFrame, `points`
