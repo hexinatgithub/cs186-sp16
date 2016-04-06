@@ -55,7 +55,7 @@ under the directory `~cs186/sp16/fec_2016_3_25`.
 (You can also download a copy of the data we used [here]
 (http://eecs.berkeley.edu/~jegonzal/fec_2016_3_25.tar.bz2)).
 Each table consists of a header `.csv` file and a data `.txt` file. For example,
-this is the Candidate Master header file (`cm_header_file.csv`)
+this is the Committee Master header file (`cm_header_file.csv`)
 
 ```
 MTE_ID,CMTE_NM,TRES_NM,CMTE_ST1,CMTE_ST2,CMTE_CITY,CMTE_ST,CMTE_ZIP,CMTE_DSGN,CMTE_TP,CMTE_PTY_AFFILIATION,CMTE_FILING_FREQ,ORG_TP,CONNECTED_ORG_NM,CAND_ID
