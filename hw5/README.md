@@ -264,13 +264,13 @@ Answer the following questions by writing queries:
     and Ted Cruz)?
     Hint: Take a look at the output of the demonstration. What values do we want
     these columns to have?
- 2. How many individual contributions has each candidate received? 
+ 2. How many individual contributions has each front-runner's principal campaign committee received? 
     Hint: Which table might you want to join on?
- 3. How much has each candidate received from individual contributions?
- 4. What are the committees that are linked to each of the candidates?
+ 3. How much has each front-runner received from individual contributions?
+ 4. What are the committees that are linked to each of the front-runners?
     Hint: How many tables will we need for this?
- 5. How many committees have contributed to each candidate?
- 6. How much has each candidate received from committee contributions?
+ 5. How many committees have contributed to each front-runner?
+ 6. How much has each front-runner received from committee contributions?
 
 **Note: The penultimate line of each cell describes the schema for the output
 we're expecting. If you change this line, make sure that your output's schema
