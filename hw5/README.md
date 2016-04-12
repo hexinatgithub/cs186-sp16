@@ -205,7 +205,7 @@ applications:
 arr = np.zeros(k)
 
 # a matrix of size k * d
-mat = np.zeros(k, d)
+mat = np.zeros((k, d))
 
 # python list as NumPy vector
 numbers_arr = np.asarray(python_list)
@@ -233,7 +233,8 @@ Time to put your database skills to use!
 
 **Note: We will not grade code that is modified outside of the cells bracketed
 by _Begin Student Code Here_ and _End Student Code Here_ markers. Make sure all
-the changes you want to submit lie between those markers.**
+the changes you want to submit lie between those markers. DO NOT REMOVE THE
+_Begin Student Code Here_ AND _End Student Code Here_ CELLS.**
 
 ## 1. DataFrames
 
@@ -259,18 +260,19 @@ we can either write raw SQL queries, or we can use DataFrame methods to directly
 apply SQL operators. For this question, you may use either approach.
 
 Answer the following questions by writing queries:
- 1. What are the ID numbers and Principal Candidate Committee numbers of the 4
-    front-runners (Hillary Clinton, Bernie Sanders, Donald Trump,
+ 1. What are the ID numbers and Principal Candidate Committee numbers of the 4 current
+    presidential candidate front-runners (Hillary Clinton, Bernie Sanders, Donald Trump,
     and Ted Cruz)?
     Hint: Take a look at the output of the demonstration. What values do we want
     these columns to have?
- 2. How many individual contributions has each front-runner's principal campaign committee received? 
-    Hint: Which table might you want to join on?
- 3. How much has each front-runner received from individual contributions?
+ 2. How many contributions by individuals has each front-runner's principal campaign committee received? 
+    Hint: Which table might you want to join on? Do _not_ filter by ENTITY_TP.
+ 3. How much in total has each front-runner's principal campaign committee received from the contributions in Q2?
  4. What are the committees that are linked to each of the front-runners?
     Hint: How many tables will we need for this?
- 5. How many committees have contributed to each front-runner?
- 6. How much has each front-runner received from committee contributions?
+ 5. How many contributions by committees has each front-runner received? 
+    Hint: Do _not_ filter by ENTITY_TP.
+ 6. How much in total has each front-runner received from the contributions in Q5?
 
 **Note: The penultimate line of each cell describes the schema for the output
 we're expecting. If you change this line, make sure that your output's schema
@@ -284,7 +286,7 @@ DataFrames.
 We'll start with some toy data first before we return to the more complex
 campaign data. The toy data is just a collection of 2D points; you can play
 around with it to experiment. (This data is stored in the form of a
-(`Parquet`)[https://parquet.apache.org/] file for efficiency; you don't need to
+[`Parquet`](https://parquet.apache.org/) file for efficiency; you don't need to
 worry about the specifics of it except that they appear as directories in the
 file system and you can load them with `sql.read.parquet`.)
 
@@ -353,6 +355,9 @@ Try values of _k_ from 2 to 30 in increments of 2.  To speed up these experiment
 After determining this value, you can finally visualize campaign contributions
 to different candidates as geographical clusters. Congratulations on finishing
 the last project in this course!
+
+**Note: Part 3 should not take more than 20 minutes to run in total on the hive machines.**
+
 
 # Testing
 
