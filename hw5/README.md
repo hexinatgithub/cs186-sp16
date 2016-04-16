@@ -343,7 +343,7 @@ code to load the zip code data into DataFrames, so all you have to do is find
 the right value of _k_ to use. Essentially, we want a value of _k_ which
 minimizes the error from the resulting clusters; at the same time, a larger
 value of _k_ carries with it the risk of overfitting. We define the error of the
-procedure to be the sum of distances from points to their cluster center.
+procedure to be the **mean** of distances from points to their cluster center.
 
 We can get a rough idea of what value this is by trying many values and plotting
 it. The "[elbow
