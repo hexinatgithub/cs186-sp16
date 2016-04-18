@@ -1,7 +1,7 @@
 # Homework 5: Scalable Data Analytics and Machine Learning
 ### CS186, UC Berkeley, Spring 2016
 #### Points: [10% of your final grade](https://sites.google.com/site/cs186spring2016/home/basic-information)
-#### Due: Monday April 18, 2016; 11:59 PM
+#### Due: ~~Monday April 18~~ Wednesday April 20, 2016; 11:59 PM
 #### Note: *This homework is to be done individually!*
 
 You will implement the K-means clustering algorithm in Spark and use it
