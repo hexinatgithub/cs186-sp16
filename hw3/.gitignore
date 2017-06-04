@@ -1,0 +1,7 @@
+/.ipynb_checkpoints/
+/cs186_spark/
+/other/
+/tmp/
+*.tar.bz2
+/your_output/
+*.json
