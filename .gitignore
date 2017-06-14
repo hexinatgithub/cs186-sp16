@@ -2,3 +2,4 @@ hw*/*.csv.*
 .DS_Store
 *.db
 *.pyc
+/other/
