@@ -12,6 +12,115 @@ Possible abort modes.
 USER = 0
 DEADLOCK = 1
 
+class RequestLock:
+    """
+    The item in the Lock's request lock queue.
+    """
+    def __init__(self, transaction, mode):
+        """
+        @param xid: transaction.
+        @param mode: request lock mode.
+        """
+        self.transaction = transaction
+        self.mode = mode
+
+class Lock:
+    """
+    The lock infomation about the key in lock table.
+    """
+    ExclusiveLock = "ExclusiveLock"
+    SharedLock = "SharedLock"
+    
+    def __init__(self, transaction, mode, request_queue=None):
+        self.transactions = [transaction]
+        self.mode = mode
+        self.request_queue = request_queue
+        
+    def request_lock(self, transaction, mode):
+        """
+        Return True if request is grant,
+        else append the request in the request queue and return False.
+        """
+        if self.can_acquire_lock(transaction, mode):
+            if transaction not in self.transactions:
+                self.transactions.append(transaction)
+            self.mode = mode
+            return True
+        else:
+            if transaction in self.transactions:
+                self.transactions.remove(transaction)
+            self._append_request(transaction, mode)
+            return False
+    
+    def first_current_transaction(self):
+        if len(self.current_transactions()):
+            return self.current_transactions()[0]
+        return None
+    
+    def current_transactions(self):
+        return self.transactions
+    
+    def hold_lock(self, transaction, mode):
+        """
+        Return True if transaction current hold the lock and match mode.
+        """
+        return transaction in self.transactions and self.mode is mode
+
+    def can_acquire_lock(self, transaction, mode):
+        """
+        Return True if can grant transaction's lock else False.
+        """
+        if len(self.transactions) == 0:
+            return True
+        elif self.mode is Lock.ExclusiveLock:
+            return transaction in self.transactions
+        elif mode is Lock.SharedLock:
+            return True
+        elif len(self.transactions) == 1 and transaction in self.transactions:
+            return mode is Lock.ExclusiveLock
+        return False
+    
+    def release_lock(self, transaction):
+        """
+        Release the current lock hold by transation.
+        If there is a queue not empty, grant the next transation request.
+        """
+        if transaction in self.transactions:
+            self.transactions.remove(transaction)
+            
+        if len(self.transactions) == 0:
+            self.mode = None
+            self._grant_request()
+    
+    def _append_request(self, transaction, mode):
+        """
+        Append the lock in the request queue.
+        If transaction already request the lock before, upgrade it.
+        """
+        def has_request_and_update():
+            for r in self.request_queue:
+                if r.transaction is transaction:
+                    if r.mode is Lock.SharedLock:
+                        r.mode = mode
+                        return True
+            return False
+
+        if self.request_queue:
+            if not has_request_and_update():
+                self.request_queue.append(RequestLock(transaction, mode))
+        else:
+            self.request_queue = [RequestLock(transaction, mode)]
+    
+    def _grant_request(self):
+        """
+        Grant next transaction request in the request queue.
+        """
+        if self.request_queue and len(self.request_queue):
+            request = self.request_queue.pop(0)
+            self.transactions.append(request.transaction)
+            self.mode = request.mode
+            
+
 """
 Part I: Implementing request handling methods for the transaction handler
 
@@ -73,8 +182,19 @@ class TransactionHandler:
         is waiting to acquire in self._desired_lock.
         """
         # Part 1.1: your code here!
-        self._store.put(key, value)
-        return 'Success'
+        lock = self._lock_table.get(key)
+        if lock is None:
+            lock = self._lock_table[key] = Lock(self, Lock.ExclusiveLock)
+        if lock.request_lock(self, Lock.ExclusiveLock):
+            old_value = self._store.get(key)
+            self._undo_log.append((key, old_value))
+            self._acquired_locks.append(key)
+            self._store.put(key, value)
+            return 'Success'
+        else:
+            op = lambda: self.perform_put(key, value)
+            self._desired_lock = (key, Lock.ExclusiveLock, op)
+            return None
 
     def perform_get(self, key):
         """
@@ -95,11 +215,20 @@ class TransactionHandler:
         self._desired_lock.
         """
         # Part 1.1: your code here!
-        value = self._store.get(key)
-        if value is None:
-            return 'No such key'
+        lock = self._lock_table.get(key)
+        if lock is None:
+            lock = self._lock_table[key] = Lock(self, Lock.SharedLock)
+        if lock.request_lock(self, Lock.SharedLock):
+            self._acquired_locks.append(key)
+            value = self._store.get(key)
+            if value is None:
+                return 'No such key'
+            else:
+                return value
         else:
-            return value
+            op = lambda: self.perform_get(key)
+            self._desired_lock = (key, Lock.SharedLock, op)
+            return None
 
     def release_and_grant_locks(self):
         """
@@ -114,7 +243,9 @@ class TransactionHandler:
         @param self: the transaction handler.
         """
         for l in self._acquired_locks:
-            pass # Part 1.2: your code here!
+            # Part 1.2: your code here!
+            lock = self._lock_table.get(l)
+            lock.release_lock(self)
         self._acquired_locks = []
 
     def commit(self):
@@ -191,10 +322,18 @@ class TransactionHandler:
         successfully acquired the lock. If the lock has not been granted,
         returns None.
         """
-        pass # Part 1.3: your code here!
-
-
-
+        # Part 1.3: your code here!
+        if not self._desired_lock:
+            return None
+        
+        key, lock_mode, op = self._desired_lock
+        lock = self._lock_table.get(key)
+        if lock.hold_lock(self, lock_mode):
+            v = op()
+            if v:
+                self._desired_lock = None
+            return v
+        return None
 
 
 
@@ -238,4 +377,17 @@ class TransactionCoordinator:
         @return: If there are no cycles in the waits-for graph, returns None.
         Otherwise, returns the xid of a transaction in a cycle.
         """
-        pass # Part 2.1: your code here!
+        def get_desired_key_tranc(lock):
+            t = lock.first_current_transaction()
+            t_desired_lock = t._desired_lock
+            return t_desired_lock[0], t
+
+        for key, lock in self._lock_table.items():
+            try:
+                desired_key, t = get_desired_key_tranc(lock)
+                other_lock = self._lock_table[desired_key]
+                other_desired_key, other_t = get_desired_key_tranc(other_lock)
+                if other_desired_key == key:
+                    return min(t._xid, other_t._xid)
+            except Exception:
+                continue
