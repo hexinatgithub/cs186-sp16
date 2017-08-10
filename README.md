@@ -1,4 +1,6 @@
 # course
-Official public repository for CS 186 assignments.
+Berkely cs186课程-数据库系统
+https://sites.google.com/site/cs186spring2016/home
 
-For details about how submitting assignments in CS 186 works, look at [`hw0`](https://github.com/berkeley-cs186/course/blob/master/hw0/README.md).
+内容:课件和实验答案
+除了最后一个机器学习的实验，其他全部完成
